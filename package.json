@@ -1,0 +1,30 @@
+{
+  "name": "sarsa",
+  "version": "0.0.1",
+  "description": "a general SARSA implementation, an A.I. tool useful for machine learning",
+  "main": "index.js",
+  "devDependencies": {
+    "expresso": "0.9.2"
+  },
+  "scripts": {
+    "test": "expresso test/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/panchishin/sarsa.git"
+  },
+  "keywords": [
+    "sarsa",
+    "q-learning",
+    "qlearning",
+    "state action reward state action",
+    "machine learning",
+    "reinforcement"
+  ],
+  "author": {
+    "name": "Anton Panchishin"
+  },
+  "license": "Unlicense",
+  "homepage": "https://github.com/panchishin/sarsa",
+  "readmeFilename": "README.md"
+}
