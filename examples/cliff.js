@@ -25,7 +25,7 @@ function bracket(low,value,high) {
     return Math.max( low , Math.min(value,high-1) )
 }
 
-var action_list = ['up','down','right']
+var action_list = ['up','down','right','left','hold']
 
 function move(location,action) {
     location = cloneJSON(location)
@@ -56,7 +56,7 @@ function chooseAction(actions,stability) {
         return randomAction(actions)
     }
     var best_score = -1e100;
-    var best_action = 'none';
+    var best_action = 'hold';
     for (var action in actions) {
         if (actions[action] > best_score) {
             best_score = actions[action];
@@ -77,32 +77,17 @@ function randomAction(actions) {
 
 
 var sarsaConstructor = require("../index.js")
-var sarsa = sarsaConstructor({'initialReward':-.1,'alpha':0.2,'gamma':0.9})
-
-if ( 1 == 0 ) {
-    actions = sarsa.getRewards(location,action_list);
-    console.log(actions)
-
-    var location = {'w':0,'h':0}
-    console.log("The rewards for this location is "+ map[location.w][location.h] )
-
-    var action = chooseAction(actions,0.7)
-    console.log(action)
-    location = move(location,action)
-    console.log(location)
-    var reward = map[location.w][location.h]
-    console.log("The reward is " + reward)
-}
+var sarsa = sarsaConstructor({'initialReward':-.1})
 
 // main training loop
-
-for(var trials=1; trials<=50000; trials++) {
+var history = [];
+for(var trials=0; trials<=1000; trials++) {
     var location = {'w':0,'h':0}
-    var action = 'none';
+    var action = 'hold';
 
-    var moves_remaining = 100;
+    var moves_remaining = 20;
 
-    var history = [];
+    history = [];
 
     while (moves_remaining>0) {
         
@@ -124,12 +109,11 @@ for(var trials=1; trials<=50000; trials++) {
         location = next_location;
         action = next_action;
     }
-    history.push(JSON.stringify(location)+" "+action+" "+reward+" - done")
 
-    if ( trials % 10000 == 0 ) {
-        console.log("TRIAL == " + trials)
-        console.log(history)
+    if ( trials % 100 == 0 )  {
+        console.log("TRIAL == " + trials + " " + history.length + " moves " + history[history.length-1])
     }
 
 }
+console.log(history)
 
