@@ -21,7 +21,7 @@ module.exports = {
 
 		assert.equal(0.5 , config.alpha );
 		assert.equal(0.5 , config.gamma );
-		assert.equal(-1e100 , config.initialReward );
+		assert.equal(0 , config.initialReward );
 	},
 
 
@@ -32,14 +32,14 @@ module.exports = {
 
 		assert.equal(0.9 , config.alpha );
 		assert.equal(0.1 , config.gamma );
-		assert.equal(-1e100 , config.initialReward );
+		assert.equal(0 , config.initialReward );
 
 		sarsa.setOptions({'alpha':0.3});
 		config = sarsa.getOptions();
 
 		assert.equal(0.3 , config.alpha );
 		assert.equal(0.1 , config.gamma );
-		assert.equal(-1e100 , config.initialReward );
+		assert.equal(0 , config.initialReward );
 	},
 
 	'set' : function(beforeExit, assert) {

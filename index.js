@@ -7,15 +7,15 @@ module.exports = function sarsaConstructor(options) {
     var defaults = {
         'alpha' : 0.5,
         'gamma' : 0.5,
-        'initialReward' : -1e100 // a large negative
+        'initialReward' : 0
     }
 
     function optionsWithDefaults(options,defaults) {
         var result = {}
         options = options || {}
-        result.alpha = options.alpha || defaults.alpha
-        result.gamma = options.gamma || defaults.gamma
-        result.initialReward = options.initialReward || defaults.initialReward
+        result.alpha = ('alpha' in options) ? options.alpha : defaults.alpha ;
+        result.gamma = ('gamma' in options) ? options.gamma : defaults.gamma ;
+        result.initialReward = ('initialReward' in options) ? options.initialReward : defaults.initialReward ;
         return cloneJSON(result)
     }
 
