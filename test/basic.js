@@ -17,25 +17,52 @@ module.exports = {
 	'basic config has values' : function(beforeExit, assert) {
 
 		var sarsa = sarsaConstructor();
-		var config = sarsa.getOptions();
+		var config = sarsa.getConfig();
 
-		assert.equal(0.5 , config.alpha );
-		assert.equal(0.5 , config.gamma );
+		assert.equal(0.2 , config.alpha );
+		assert.equal(0.8 , config.gamma );
 		assert.equal(0 , config.initialReward );
 	},
 
 
+	'basic clone' : function(beforeExit, assert) {
+
+		var sarsa = sarsaConstructor();
+		var config = sarsa.getConfig();
+
+		assert.equal(0.2 , config.alpha );
+		assert.equal(0.8 , config.gamma );
+		assert.equal(0 , config.initialReward );
+
+		sarsa.setReward('state','action',4)
+		assert.equal( 4, sarsa.getRewards('state',['action'])['action'] )
+
+		var clone = sarsa.clone()
+
+		config = clone.getConfig();
+		assert.equal(0.2 , config.alpha );
+		assert.equal(0.8 , config.gamma );
+		assert.equal(0 , config.initialReward );
+
+		assert.equal( 4, clone.getRewards('state',['action'])['action'] )
+		clone.setReward('state','action',5)
+		assert.equal( 5, clone.getRewards('state',['action'])['action'] )
+		sarsa.setReward('state','action',4)
+		assert.equal( 4, sarsa.getRewards('state',['action'])['action'] )
+
+	},
+
 	'able to set and reset options' : function(beforeExit, assert) {
 
 		var sarsa = sarsaConstructor({'alpha':0.9,'gamma':0.1});
-		var config = sarsa.getOptions();
+		var config = sarsa.getConfig();
 
 		assert.equal(0.9 , config.alpha );
 		assert.equal(0.1 , config.gamma );
 		assert.equal(0 , config.initialReward );
 
-		sarsa.setOptions({'alpha':0.3});
-		config = sarsa.getOptions();
+		sarsa.setConfig({'alpha':0.3});
+		config = sarsa.getConfig();
 
 		assert.equal(0.3 , config.alpha );
 		assert.equal(0.1 , config.gamma );

@@ -1,26 +1,30 @@
-module.exports = function sarsaConstructor(options) {
+module.exports = function sarsaConstructor(config) {
 
     function cloneJSON( object ) {
         return JSON.parse ( JSON.stringify ( object ) )
     }
 
     var defaults = {
-        'alpha' : 0.5,
-        'gamma' : 0.5,
+        'alpha' : 0.2,     // default to a low(-ish) learning rate
+        'gamma' : 0.8,     // default of a high(-ish) dependance on future expectation
         'initialReward' : 0
     }
 
-    function optionsWithDefaults(options,defaults) {
+    function configWithDefaults(config,defaults) {
         var result = {}
-        options = options || {}
-        result.alpha = ('alpha' in options) ? options.alpha : defaults.alpha ;
-        result.gamma = ('gamma' in options) ? options.gamma : defaults.gamma ;
-        result.initialReward = ('initialReward' in options) ? options.initialReward : defaults.initialReward ;
+        config = config || {}
+        result.alpha = (('alpha' in config) ? config.alpha : defaults.alpha )
+        result.gamma = (('gamma' in config) ? config.gamma : defaults.gamma )
+        result.initialReward = (('initialReward' in config) ? config.initialReward : defaults.initialReward )
         return cloneJSON(result)
     }
 
-    var option_values = optionsWithDefaults(options,defaults);
+    var option_values = configWithDefaults(config,defaults);
     var states = {}
+    if (config && ('states' in config)) {
+        states = cloneJSON(config.states)
+        delete(config.states)
+    }
 
 
     function setReward(state,action,reward) {
@@ -46,11 +50,12 @@ module.exports = function sarsaConstructor(options) {
 
 
     return {
-        getOptions : function() {
+        getConfig : function() {
             return cloneJSON(option_values)
         },
-        setOptions : function(options) {
-            option_values = optionsWithDefaults(options,option_values)
+        setConfig : function(config) {
+            option_values = configWithDefaults(config,option_values)
+            return this
         },
 
         setReward : function(state,action,reward) {
@@ -75,11 +80,12 @@ module.exports = function sarsaConstructor(options) {
             setReward(state0,action0,result)
             return result
 
-
         },
-
-        getStates : function() {
-            return cloneJSON(states)
+        getState : function() {
+            return states
         },
+        clone : function() {
+            return sarsaConstructor({'states':states}).setConfig(option_values)
+        }
     }
 }

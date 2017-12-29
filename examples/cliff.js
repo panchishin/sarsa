@@ -1,62 +1,33 @@
+console.log("\nThis is the cliff problem.\nThe virtual world consists of a 7x3 world like so:\n\n" +
+" +-------+\n |ScccccR|\n |       |\n |       |\n +-------+\n\n" +
+"The bot starts at 'S' and is trying to get to 'R'.  If the bot touches a 'c' it falls off the cliff.\n" +
+"Falling off the cliff is -10,000 points, the reward is 1,000 points, and everything else is -1 point.\n" +
+"After the bot falls or gets a reward it starts again.  To make matters more challenging, 2% of the\n" +
+"time the bot will move randomly, increasing the odds that it falls off the cliff.\n" +
+"It takes 12 moves to take the 'long' way around the cliff, so a score of 80 is near perfect\n" +
+"and assumes that no random movements delay the bot.\n")
 
-var map = [];
-var width = 6;
-var height = 3;
-for( var w=0; w<width; w++) {
-    var row = []
-    map.push(row)
-    for( var h=0; h<height; h++) {
-        if ( h == 0 && w != 0 && w != width-1) {
-            row.push(-100); // death
-        } else if ( h == 0 && w == width-1 ) {
-            row.push(100); // cheese
-        } else {
-            row.push(-1); // get tired
-        }
-    }
-}
+var map = [ 
+  [    -1, -1, -1 ],
+  [ -10000, -1, -1 ],
+  [ -10000, -1, -1 ],
+  [ -10000, -1, -1 ],
+  [ -10000, -1, -1 ],
+  [ -10000, -1, -1 ],
+  [  1000, -1, -1 ] 
+];
+var width = map.length;
+var height = map[0].length;
 
-function bracket(low,value,high) {
-    return Math.max( low , Math.min(value,high-1) )
-}
-
-var action_list = ['up','down','right','left']
-
+// The possible actions
+var action_list = ['up','down','right','left','hold']
+    
 function move(location,action) {
-    location = JSON.parse ( JSON.stringify ( location) )
-    if ( action == 'up' ) {
-        location.h += 1
-    }
-    if ( action == 'down' ) {
-        location.h -= 1
-    }
-    if ( action == 'left' ) {
-        location.w -= 1 
-    }
-    if ( action == 'right' ) {
-        location.w += 1
-    }
-    location.h = bracket( 0 , location.h , height )
-    location.w = bracket( 0 , location.w , width )
-    return location
-}
-
-
-function chooseAction(actions,stability) {
-    if ( Math.random() > stability ) {
-        return randomAction(actions)
-    }
-    var best_score = -1e100;
-    var best_action = 'hold';
-    for (var action in actions) {
-        if (actions[action] > best_score) {
-            best_score = actions[action];
-            best_action = action;
-        } else if (actions[action] == best_score) {
-            return randomAction(actions)
-        }
-    }
-    return best_action
+    if ( action == 'up'    ) { return { 'h' : Math.min(location.h + 1, height-1), 'w' : location.w } }
+    if ( action == 'down'  ) { return { 'h' : Math.max(location.h - 1, 0),        'w' : location.w } }
+    if ( action == 'left'  ) { return { 'h' : location.h , 'w' : Math.min(location.w + 1, width-1) } }
+    if ( action == 'right' ) { return { 'h' : location.h , 'w' : Math.max(location.w - 1, 0)       } }
+    return { 'h':location.h, 'w':location.w }
 }
 
 function randomAction(actions) {
@@ -64,50 +35,61 @@ function randomAction(actions) {
     return actions[ Math.trunc( Math.random()*(actions.length) ) ]
 }
 
+function chooseAction(actions,stability) {
+    if ( Math.random() > stability ) { return randomAction(actions) }
+    var best_score = Object.values(actions).reduce(function(a,b){return (a>b)?a:b })
+    return Object.keys(actions).filter( function( key ) { return actions[key] == best_score } )[0]
+}
+
 
 var sarsaConstructor = require("../index.js")
-var sarsa = sarsaConstructor()
 
-// main training loop
-var history = [];
-var total_score = [];
+// use a low learning rate (alpha) and a large signal from future expectation (gamma)
+var sarsa = sarsaConstructor({'alpha':0.2,'gamma':0.8})
 
-for(var trials=0; trials<=4096; trials++) {
-    var location = {'w':0,'h':0}
-    var action = 'hold';
+var location = null;
+var action = null;
+var reward = 0;
+var lambda_reward = 0;
+var lambda_fraction = 8;
 
-    var moves_remaining = 100;
-    var reward = 0;
+var trials_max = 16384*4;
+for(var trials=1; trials<=trials_max; trials++) {
 
-    history = [];
-
-    while (moves_remaining>0) {
-        
-        var next_location = move(location,action);
-        var next_actions = sarsa.getRewards(next_location,action_list);
-        var next_action = chooseAction(next_actions, (trials==4096 ? 1.0 : 0.98) );
-
-        reward = map[next_location.w][next_location.h];
-
-        if ( reward == -1 ) {
-            moves_remaining -= 1;
-        } else {
-            moves_remaining = 0;
-        }
-
-        history.push(JSON.stringify(location)+" "+action+" "+reward+" "+JSON.stringify(next_location)+" "+next_action+" "+JSON.stringify(next_actions))
-        sarsa.update(location,action,reward,next_location,next_action)
-
-        location = next_location;
-        action = next_action;
-
-        total_score.push(reward)
+    if ( reward != -1 ) {
+        location = {'w':0,'h':0}
+        action = 'hold'
     }
 
-    if ( Math.log2(trials) % 1 == 0 )  {
-        console.log("TRIAL == " + trials + " " + history.length + " moves, last reward " + reward + " average reward " + ( total_score.reduce(function(x,y){return x+y}) / total_score.length ) )
-        total_score = []
+    var next_location = move(location,action);
+    var next_actions = sarsa.getRewards(next_location,action_list);
+    var next_action = chooseAction(next_actions, 0.98 );
+
+    reward = map[next_location.w][next_location.h];
+
+    sarsa.update(location,action,reward,next_location,next_action)
+
+    location = next_location;
+    action = next_action;
+
+    // calculate lambda average over a lambda_fraction of the current number of trials
+    var lambda = lambda_fraction/trials
+    lambda_reward = lambda_reward*(1-lambda) + reward*lambda
+
+    if ( Math.log2(trials) % 1 == 0 && trials >= 64 )  {
+        console.log("Move " + trials + " , average reward per move " + Math.round(lambda_reward) )
     }
 
 }
-console.log(history)
+
+
+if ( Math.round(lambda_reward) >= 75 ) {
+    console.log("\nAfter " + trials + " moves the SARSA RL algorithm found a solution to the\n"+
+    "cliff problem and accumulated an average of " + Math.round(lambda_reward) + " points per move.\n"+
+    "These results are good and expected.\n")
+} else if (Math.round(lambda_reward) >= 50 ) {
+    console.log("\nThese results are fair.  Try running the simulation again.\n")
+} else {
+    console.log("\nThese results are very poor.  Try running the simulation again.\n")
+
+}
