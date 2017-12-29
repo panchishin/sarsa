@@ -149,6 +149,7 @@ This is part of a set of related projects.
 * [GeneticAlgorithm](https://www.npmjs.com/package/geneticalgorithm)
 * [NearestNeighbour](https://www.npmjs.com/package/nearestneighbour)
 * [NeuralNet](https://www.npmjs.com/package/neuralnet)
+* [SARSA](https://www.npmjs.com/package/sarsa)
 
 # References
 
