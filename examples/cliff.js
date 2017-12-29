@@ -15,20 +15,15 @@ for( var w=0; w<width; w++) {
         }
     }
 }
-console.log(map)
-
-function cloneJSON( object ) {
-    return JSON.parse ( JSON.stringify ( object ) )
-}
 
 function bracket(low,value,high) {
     return Math.max( low , Math.min(value,high-1) )
 }
 
-var action_list = ['up','down','right','left','hold']
+var action_list = ['up','down','right','left']
 
 function move(location,action) {
-    location = cloneJSON(location)
+    location = JSON.parse ( JSON.stringify ( location) )
     if ( action == 'up' ) {
         location.h += 1
     }
@@ -45,10 +40,6 @@ function move(location,action) {
     location.w = bracket( 0 , location.w , width )
     return location
 }
-
-
-
-
 
 
 function chooseAction(actions,stability) {
@@ -68,24 +59,25 @@ function chooseAction(actions,stability) {
     return best_action
 }
 
-
 function randomAction(actions) {
     actions = Object.keys(actions)
     return actions[ Math.trunc( Math.random()*(actions.length) ) ]
 }
 
 
-
 var sarsaConstructor = require("../index.js")
-var sarsa = sarsaConstructor({'initialReward':-.1})
+var sarsa = sarsaConstructor()
 
 // main training loop
 var history = [];
-for(var trials=0; trials<=1000; trials++) {
+var total_score = [];
+
+for(var trials=0; trials<=4096; trials++) {
     var location = {'w':0,'h':0}
     var action = 'hold';
 
-    var moves_remaining = 20;
+    var moves_remaining = 100;
+    var reward = 0;
 
     history = [];
 
@@ -93,9 +85,9 @@ for(var trials=0; trials<=1000; trials++) {
         
         var next_location = move(location,action);
         var next_actions = sarsa.getRewards(next_location,action_list);
-        var next_action = chooseAction(next_actions,0.99);
+        var next_action = chooseAction(next_actions, (trials==4096 ? 1.0 : 0.98) );
 
-        var reward = map[next_location.w][next_location.h];
+        reward = map[next_location.w][next_location.h];
 
         if ( reward == -1 ) {
             moves_remaining -= 1;
@@ -108,12 +100,14 @@ for(var trials=0; trials<=1000; trials++) {
 
         location = next_location;
         action = next_action;
+
+        total_score.push(reward)
     }
 
-    if ( trials % 100 == 0 )  {
-        console.log("TRIAL == " + trials + " " + history.length + " moves " + history[history.length-1])
+    if ( Math.log2(trials) % 1 == 0 )  {
+        console.log("TRIAL == " + trials + " " + history.length + " moves, last reward " + reward + " average reward " + ( total_score.reduce(function(x,y){return x+y}) / total_score.length ) )
+        total_score = []
     }
 
 }
 console.log(history)
-
