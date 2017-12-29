@@ -52,7 +52,9 @@ var defaults = {
 
 module.exports = function sarsaConstructor(config) {
 
-    var instance = {
+    return {
+        _config : configWithDefaults(config,defaults),
+        _policy : {},
         getConfig : function() {
             return cloneJSON(this._config)
         },
@@ -79,11 +81,4 @@ module.exports = function sarsaConstructor(config) {
         }
     }
 
-    instance._config = configWithDefaults(config,defaults);
-    instance._policy = {}
-    if (config && ('policy' in config)) {
-        instance._policy = cloneJSON(config.this._policy)
-    }
-
-    return instance
 }
