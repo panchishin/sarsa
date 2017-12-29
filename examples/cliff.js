@@ -30,22 +30,18 @@ function move(location,action) {
     return { 'h':location.h, 'w':location.w }
 }
 
-function randomAction(actions) {
-    actions = Object.keys(actions)
-    return actions[ Math.trunc( Math.random()*(actions.length) ) ]
-}
-
-function chooseAction(actions,stability) {
-    if ( Math.random() > stability ) { return randomAction(actions) }
-    var best_score = Object.values(actions).reduce(function(a,b){return (a>b)?a:b })
-    return Object.keys(actions).filter( function( key ) { return actions[key] == best_score } )[0]
-}
-
-
 var sarsaConstructor = require("../index.js")
 
-// use a low learning rate (alpha) and a large signal from future expectation (gamma)
-var sarsa = sarsaConstructor({'alpha':0.2,'gamma':0.8})
+
+var defaultSettings = {
+    'alpha':0.2,            // a low learning rate (alpha)
+    'gamma':0.8,            // a large signal from future expectation (gamma)
+    'defaultReward' : 0,
+    'epsilon':0.02,
+    'policy':'epsilonGreedy' // do greedy other usually, else softmax, using epsilon as ratio
+}
+
+var sarsa = sarsaConstructor(defaultSettings)
 
 var location = null;
 var action = null;
@@ -62,8 +58,7 @@ for(var trials=1; trials<=trials_max; trials++) {
     }
 
     var next_location = move(location,action);
-    var next_actions = sarsa.getRewards(next_location,action_list);
-    var next_action = chooseAction(next_actions, 0.98 );
+    var next_action = sarsa.chooseAction(next_location,action_list );
 
     reward = map[next_location.w][next_location.h];
 
@@ -82,7 +77,6 @@ for(var trials=1; trials<=trials_max; trials++) {
 
 }
 
-
 if ( Math.round(lambda_reward) >= 75 ) {
     console.log("\nAfter " + trials + " moves the SARSA RL algorithm found a solution to the\n"+
     "cliff problem and accumulated an average of " + Math.round(lambda_reward) + " points per move.\n"+
@@ -91,5 +85,4 @@ if ( Math.round(lambda_reward) >= 75 ) {
     console.log("\nThese results are fair.  Try running the simulation again.\n")
 } else {
     console.log("\nThese results are very poor.  Try running the simulation again.\n")
-
 }

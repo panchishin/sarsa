@@ -130,15 +130,41 @@ Here we can see the *Q(t)* is the main term in the lambda average (because it is
 
 If you inspect the source code you will see that I use the reformulation.  It is exactly equal to the original equation.
 
-# Common Action Selection Policies
+# Built in Action Selection Policies
 
-greedy - choose the action with the highest estimated reward is chosen, called the greediest action, but *epsilon* fraction of trials instead choose an action at random.  In practice this both helps a bit with exploration and caution.
+### greedy
+choose the action with the highest estimated reward is chosen, called the greediest action
 
-soft - choose the action with the highest estimated reward using ```1 - epsilon + epsilon/|A(s)|``` , else choose one at random.  ```|A(s)|``` is the number of actions).
+### epsilonGreedy
+choose the action with the highest estimated reward is chosen, called the greediest action, but in *epsilon* fraction of trials instead choose an action at random.  In practice this both helps a bit with exploration and caution.
 
-softmax - selecting a random action uniformly has drawbacks. With uniform, the worst action is as likely as the second best. Softmax selects by relative likeliness.  This can help with exploring a few highly weighted actions while at the same time avoiding very low weighted actions.
+### epsilonSoft
+choose the action with the highest estimated reward like greedy, but in ```epsilon - epsilon/|A(s)|``` fraction of trials choose one at random.  ```|A(s)|``` is the number of actions).
 
+### softmax
+selecting a random action uniformly has drawbacks. With uniform, the worst action is as likely as the second best. Softmax selects by relative likeliness.  This can help with exploring a few highly weighted actions while at the same time avoiding very low weighted actions.
 
+### epsilonGreedySoftmax
+choose the action with the highest estimated reward is chosen, called the greediest action, but in *epsilon* fraction of trials instead choose using softmax.
+
+### random
+choose an action at random
+
+# Creating a custom Action Selection Policy
+You can create your own policies.  Simply put, the responsibility of the policy is to choose an action given an associative array of *action-reward* pairs.
+
+An *action-reward* pair may by any valid associative array with floats for values.  Let's imagine we are solving a 2D game where actions are one of the 4 compass directions.  We call ```var actions = sarsa.getRewards(state,['north','south','east','west'])``` and get the following:
+```js
+actions = {'north':6,'south':-9,'east':2,'west':0}
+```
+An action selection policy takes the actions and epsilon, and returns one of the keys from the actions associative array.  In this case it will respond with one of 'north','south','east','west'.
+
+We could implement a policy that arbitarily returns the first action like so.
+```js
+function returnFirstActionPolicy(actions,epsilon) {
+	return Object.keys(actions)[0]
+}
+```
 
 
 # Related AI Projects
