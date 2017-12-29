@@ -38,7 +38,7 @@ var defaultSettings = {
     'gamma':0.8,            // a large signal from future expectation (gamma)
     'defaultReward' : 0,
     'epsilon':0.02,
-    'policy':'epsilonGreedy' // do greedy other usually, else softmax, using epsilon as ratio
+    'policy':'epsilonGreedy'
 }
 
 var sarsa = sarsaConstructor(defaultSettings)
