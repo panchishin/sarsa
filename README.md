@@ -2,9 +2,9 @@
 
 SARSA
 
-A reinforcement learning algorithm that improves upon Q-Learning.  It is a type of Markov decision process policy.
+SARSA is A reinforcement learning algorithm that improves upon Q-Learning.  It is a type of Markov decision process policy.
 The name comes from the components that are used in the update loop, specifically 
-*S*tate - *A*ction - *R*eward - *S*tate - *A*ction, where the last reward,stateaction are from then next time step.
+**S**tate - **A**ction - **R**eward - **S**tate - **A**ction, where the last reward,stateaction are from then next time step.
 A shortcoming that Q-learning has that SARSA partially overcomes is that the equation uses the optimal expected 
 reward from the future timestep to update its policy when it may not be able to achieve the optimal expected reward. 
 
@@ -73,7 +73,7 @@ This clones a sarsa instance and all of the internal state.  The two instances w
 # Execution
 
 ### sarsa.update( )
-This is the main update policy.  It requires 5 parameters, the *S*tate - *A*ction - *R*eward - *S*tate - *A*ction, where the reward and the second state and action are from the next time step.
+This is the main update policy.  It requires 5 parameters, the **S**tate - **A**ction - **R**eward - **S**tate - **A**ction, where the reward and the second state and action are from the next time step.
 
 If you have some state and action for time step 0 called *state0* and *action0*, some *reward* that is an outcome from that, and a state and action for time step 1 called *state1* and *action1*, then you call the update like so:
 ```js
