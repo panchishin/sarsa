@@ -25,7 +25,7 @@ The minimal configuration for constructing an sarsa policy is like so:
 var config = {
     alpha: yourAlpha,	// defaults to 0.2.  Must be in the range of 0 to 1.  This is the learning rate.
     gamma: yourGamma,   // defaults to 0.8.  Must be in the range of 0 to 1.  This is the signal of future rewards.
-    initialReward: yourDefault,  // defaults to 0. the default reward given to uninitialized state/action pairs.
+    defaultReward: yourDefault,  // defaults to 0. the default reward given to uninitialized state/action pairs.
     state: initialState // defaults to empty.  If you retrieved a previous internal state using getState you could initialize your Sarsa policy with it.
 }
 var sarsaConstructor = require('sarsa')
@@ -52,15 +52,15 @@ In the above example the _alpha_ configuration parameter was changed and all oth
 Similarly, if you want to change the initial reward for uninitialized state/action pairs to 7 part way through
 execution you could do so like so:
 ```js
-sarsa.setConfig({initialReward:7})
+sarsa.setConfig({defaultReward:7})
 ```
 
-### sarsa.getState( )
+### sarsa.\_policy
 You can retrieve the internal state like so:
 ```js
-sarsa.getState()
+sarsa._policy
 ```
-This could be large.  **Warning**: this function does not return a copy of the state.  It is the state and modifying it will result in modifying the internal workings of your Sarsa instance.
+This could be large.  **Warning**: this does not return a copy of the state.  It is the state and modifying it will result in modifying the internal workings of your Sarsa instance.
 
 ### sarsa.clone( )
 You can clone an entire SARSA entity, it's internal data and configuration like so:
@@ -129,6 +129,16 @@ Q(t) <-- ( 1 - a )Q(t) + (a)( r + yQ(t+1) )
 Here we can see the *Q(t)* is the main term in the lambda average (because it is multiplied by *1-a*) and *r + yQ(t+1)* is the incriment.  *a* just determines the fractional combination of the original *Q(t)* to the new *r + yQ(t+1)*.
 
 If you inspect the source code you will see that I use the reformulation.  It is exactly equal to the original equation.
+
+# Common Action Selection Policies
+
+greedy - choose the action with the highest estimated reward is chosen, called the greediest action, but *epsilon* fraction of trials instead choose an action at random.  In practice this both helps a bit with exploration and caution.
+
+soft - choose the action with the highest estimated reward using ```1 - epsilon + epsilon/|A(s)|``` , else choose one at random.  ```|A(s)|``` is the number of actions).
+
+softmax - selecting a random action uniformly has drawbacks. With uniform, the worst action is as likely as the second best. Softmax selects by relative likeliness.  This can help with exploring a few highly weighted actions while at the same time avoiding very low weighted actions.
+
+
 
 
 # Related AI Projects

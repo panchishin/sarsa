@@ -21,7 +21,7 @@ module.exports = {
 
 		assert.equal(0.2 , config.alpha );
 		assert.equal(0.8 , config.gamma );
-		assert.equal(0 , config.initialReward );
+		assert.equal(0 , config.defaultReward );
 	},
 
 
@@ -32,7 +32,7 @@ module.exports = {
 
 		assert.equal(0.2 , config.alpha );
 		assert.equal(0.8 , config.gamma );
-		assert.equal(0 , config.initialReward );
+		assert.equal(0 , config.defaultReward );
 
 		sarsa.setReward('state','action',4)
 		assert.equal( 4, sarsa.getRewards('state',['action'])['action'] )
@@ -42,7 +42,7 @@ module.exports = {
 		config = clone.getConfig();
 		assert.equal(0.2 , config.alpha );
 		assert.equal(0.8 , config.gamma );
-		assert.equal(0 , config.initialReward );
+		assert.equal(0 , config.defaultReward );
 
 		assert.equal( 4, clone.getRewards('state',['action'])['action'] )
 		clone.setReward('state','action',5)
@@ -59,19 +59,19 @@ module.exports = {
 
 		assert.equal(0.9 , config.alpha );
 		assert.equal(0.1 , config.gamma );
-		assert.equal(0 , config.initialReward );
+		assert.equal(0 , config.defaultReward );
 
 		sarsa.setConfig({'alpha':0.3});
 		config = sarsa.getConfig();
 
 		assert.equal(0.3 , config.alpha );
 		assert.equal(0.1 , config.gamma );
-		assert.equal(0 , config.initialReward );
+		assert.equal(0 , config.defaultReward );
 	},
 
 	'set' : function(beforeExit, assert) {
 
-		var sarsa = sarsaConstructor({'alpha':0.9,'gamma':0.1,'initialReward':-100});
+		var sarsa = sarsaConstructor({'alpha':0.9,'gamma':0.1,'defaultReward':-100});
 
 		sarsa.setReward(5,'up',1);
 		var actions = sarsa.getRewards(5,['up','down']);
@@ -82,7 +82,7 @@ module.exports = {
 
 	'update' : function(beforeExit, assert) {
 
-		var sarsa = sarsaConstructor({'alpha':0.9,'gamma':0.1,'initialReward':-1});
+		var sarsa = sarsaConstructor({'alpha':0.9,'gamma':0.1,'defaultReward':-1});
 		var actions = sarsa.getRewards(5,['up','down']);
 
 		assert.equal(-1 , actions.up);
