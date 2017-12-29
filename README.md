@@ -10,7 +10,7 @@ reward from the future timestep to update its policy when it may not be able to 
 
 This implementation handles the core SARSA equation and makes few assumptions about your specific problem.
 
-Section Links : [Construction](#construction) , [Execution](#execution) , [Examples](#example) , [Phenotype](#phenotype) , [FAQ](#faq) , [Related](#related-ai-projects) , and [References](#references)
+Section Links : [Construction](#construction) , [Execution](#execution) , [Examples](#example) , [Equation](#equation), [Built in Action Selection Policies](#built-in-action-selection-policies), [Related](#related-ai-projects) , and [References](#references)
 
 # Construction
 
