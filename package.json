@@ -1,6 +1,6 @@
 {
   "name": "sarsa",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "a general SARSA implementation, an A.I. tool useful for machine learning",
   "main": "index.js",
   "devDependencies": {
