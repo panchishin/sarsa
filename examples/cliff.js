@@ -24,11 +24,11 @@ var height = map[0].length;
 var action_list = ['up','down','right','left','hold']
     
 function move(location,action) {
-    if ( action == 'up'    ) { return { 'h' : Math.min(location.h + 1, height-1), 'w' : location.w } }
-    if ( action == 'down'  ) { return { 'h' : Math.max(location.h - 1, 0),        'w' : location.w } }
-    if ( action == 'left'  ) { return { 'h' : location.h , 'w' : Math.min(location.w + 1, width-1) } }
-    if ( action == 'right' ) { return { 'h' : location.h , 'w' : Math.max(location.w - 1, 0)       } }
-    return { 'h':location.h, 'w':location.w }
+    if ( action == 'up'    ) { return [ location[0]                        , Math.min(location[1] + 1, height-1) ] }
+    if ( action == 'down'  ) { return [ location[0]                        , Math.max(location[1] - 1, 0) ] }
+    if ( action == 'left'  ) { return [ Math.min(location[0] + 1, width-1) , location[1] ] }
+    if ( action == 'right' ) { return [ Math.max(location[0] - 1, 0)       , location[1] ] }
+    return [ location[0] , location[1] ]
 }
 
 var sarsaConstructor = require("../index.js")
@@ -41,7 +41,7 @@ var action = null;
 var reward = 0;
 
 // let it learn by trying a lot.  This is the number of moves, not the number of games.
-var trials_max = 65536*2;
+var trials_max = 8192;
 
 // we keep track of the last several rewards to calculate average reward
 var reward_history = [];
@@ -56,7 +56,7 @@ for(var trials=1; trials<=trials_max; trials++) {
 
     // if the bot touches something other than regular 'ground' then restart.
     if ( reward != -1 ) {
-        location = {'w':0,'h':0}
+        location = [0,0]
         action = 'hold'
         last_full_run = current_run
         current_run = [location]
@@ -67,12 +67,12 @@ for(var trials=1; trials<=trials_max; trials++) {
     var next_action = sarsa.chooseAction(next_location,action_list );
 
     // 20% of the time the bot does not go where it wants but instead does something random
-    if (( Math.random() <= 0.2 )&&( trials < trials_max - 100 )) {
-        next_action = action_list[Math.floor(Math.round()*5)]
+    if (( Math.random() <= 0.05 )&&( trials < trials_max - 800 )) {
+        next_action = action_list[Math.floor(Math.random()*4)]
     }
 
     // get reward from map, see top
-    reward = map[next_location.w][next_location.h];
+    reward = map[next_location[0]][next_location[1]];
 
     sarsa.update(location,action,reward,next_location,next_action)
 
@@ -108,9 +108,7 @@ if ( average_reward >= 70 ) {
 }
 
 console.log("Here is the last run.")
-for( i in last_full_run ) {
-    console.log(last_full_run[i])
-}
+console.log( last_full_run.map(function(a){return "["+a+"]"}).join(" ") )
 
 var map = [ 
   [ 'S', ' ', ' ' ],
@@ -138,7 +136,7 @@ console.log("An empty map")
 printMap(map)
 
 for( i in last_full_run ) {
-    map[ last_full_run[i]['w'] ][ last_full_run[i]['h'] ] = "x"
+    map[ last_full_run[i][0] ][ last_full_run[i][1] ] = "x"
 }
 
 console.log("The last path taken marked by 'x'")

@@ -104,7 +104,7 @@ var defaults = {
     'gamma' : 0.8,     // default of a high(-ish) dependance on future expectation
     'defaultReward' : 0,
     'epsilon' : 0.001,
-    'policy' : epsilonGreedyPolicy
+    'policy' : 'greedy'
 }
 
 function configWithDefaults(config,defaults) {

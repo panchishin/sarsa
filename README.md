@@ -26,7 +26,7 @@ var config = {
     alpha: yourAlpha,	// defaults to 0.2.  Must be in the range of 0 to 1.  This is the learning rate.
     gamma: yourGamma,   // defaults to 0.8.  Must be in the range of 0 to 1.  This is the signal of future rewards.
     defaultReward: yourDefault,  // defaults to 0. the default reward given to uninitialized state/action pairs.
-    policy: yourPolicyFunction, // defaults to 'epsilonGreedy'.  
+    policy: yourPolicyFunction, // defaults to 'greedy'.  
         // a string naming one of the built in action selection policies
         // (such as 'greedy','softmax','random') or a custom policy function.
     epsilon: yourEpsilon,      // defaults to 0.001.  A parameter for the policy function
