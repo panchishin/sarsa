@@ -66,7 +66,7 @@ for(var trials=1; trials<=trials_max; trials++) {
     var next_location = move(location,action);
     var next_action = sarsa.chooseAction(next_location,action_list );
 
-    // 20% of the time the bot does not go where it wants but instead does something random
+    // 5% of the time the bot does not go where it wants but instead does something random
     if (( Math.random() <= 0.05 )&&( trials < trials_max - 800 )) {
         next_action = action_list[Math.floor(Math.random()*4)]
     }
